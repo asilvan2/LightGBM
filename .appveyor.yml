@@ -5,11 +5,6 @@ platform: x64
 configuration:  # a trick to construct a build matrix with multiple Python versions
   - 3.6
 
-environment:
-  matrix:
-    - COMPILER: MSVC
-    - COMPILER: MINGW
-
 clone_depth: 50
 
 install:
@@ -34,17 +29,24 @@ install:
   - set PATH=%CONDA_PREFIX%\Library\bin\graphviz;%PATH%  # temp graphviz hotfix
 
 build_script:
-  - cd %APPVEYOR_BUILD_FOLDER%\python-package
-  - IF "%COMPILER%"=="MINGW" (
-    python setup.py install --mingw)
-    ELSE (
-    python setup.py install)
+  - ps: >-
+      function Check-Output {
+        param( [bool]$success )
+        if (!$success) {
+          $host.SetShouldExit(-1)
+          Exit -1
+        }
+      }
+      mkdir $env:APPVEYOR_BUILD_FOLDER/build; cd $env:APPVEYOR_BUILD_FOLDER/build
+      cmake -A x64 .. ; cmake --build . --target ALL_BUILD --config Release ; Check-Output $?
+      cd $env:APPVEYOR_BUILD_FOLDER/python-package
+      python setup.py install --precompile ; Check-Output $?
 
 test_script:
   - pytest %APPVEYOR_BUILD_FOLDER%\tests\python_package_test
   - cd %APPVEYOR_BUILD_FOLDER%\examples\python-guide
   - ps: >-
-      @("import matplotlib", "matplotlib.use('Agg')") + (Get-Content "plot_example.py") | Set-Content "plot_example.py"  # prevent interactive window mode
+      @("import matplotlib", "matplotlib.use('Agg')") +Â (Get-Content "plot_example.py") | Set-ContentÂ "plot_example.py"  # prevent interactive window mode
       (Get-Content "plot_example.py").replace('graph.render(view=True)', 'graph.render(view=False)') | Set-Content "plot_example.py"
   - ps: >-
       foreach ($file in @(Get-ChildItem *.py)) {
