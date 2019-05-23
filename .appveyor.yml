@@ -30,7 +30,7 @@ install:
 
 build_script:
   - cd %APPVEYOR_BUILD_FOLDER%\python-package
-  - python setup.py install
+  - python setup.py install --bit32
 
 test_script:
   - pytest %APPVEYOR_BUILD_FOLDER%\tests\python_package_test
