@@ -30,7 +30,9 @@ install:
 
 build_script:
   - cd %APPVEYOR_BUILD_FOLDER%\python-package
-  - python setup.py install --mingw --bit32
+  - python setup.py sdist --formats gztar
+  - cd dist
+  - pip install lightgbm-2.2.4.tar.gz -v
 
 test_script:
   - pytest %APPVEYOR_BUILD_FOLDER%\tests\python_package_test
