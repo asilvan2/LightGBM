@@ -29,12 +29,8 @@ install:
   - set PATH=%CONDA_PREFIX%\Library\bin\graphviz;%PATH%  # temp graphviz hotfix
 
 build_script:
-  - mkdir %APPVEYOR_BUILD_FOLDER%\build
-  - cd %APPVEYOR_BUILD_FOLDER%\build
-  - cmake -A Win32 ..
-  - cmake --build . --target ALL_BUILD --config Release
   - cd %APPVEYOR_BUILD_FOLDER%\python-package
-  - python setup.py install --precompile --bit32
+  - python setup.py install
 
 test_script:
   - pytest %APPVEYOR_BUILD_FOLDER%\tests\python_package_test
