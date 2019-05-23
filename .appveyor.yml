@@ -30,9 +30,9 @@ install:
 
 build_script:
   - cd %APPVEYOR_BUILD_FOLDER%\python-package
-  - python setup.py sdist --formats gztar
+  - python setup.py bdist_wheel --plat-name=win32 --universal
   - cd dist
-  - pip install lightgbm-2.2.4.tar.gz -v --install-option=--bit32
+  - pip install lightgbm-2.2.4-py2.py3-none-win32.whl
 
 test_script:
   - pytest %APPVEYOR_BUILD_FOLDER%\tests\python_package_test
