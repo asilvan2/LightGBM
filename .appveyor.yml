@@ -1,7 +1,7 @@
 version: 2.2.4.{build}
 
 image: Visual Studio 2015
-platform: x64
+platform: x86
 configuration:  # a trick to construct a build matrix with multiple Python versions
   - 3.6
 
@@ -10,15 +10,15 @@ clone_depth: 50
 install:
   - git submodule update --init --recursive  # get `compute` folder
   - set PATH=%PATH:C:\Program Files\Git\usr\bin;=%  # delete sh.exe from PATH (mingw32-make fix)
-  - set PATH=C:\mingw-w64\x86_64-8.1.0-posix-seh-rt_v6-rev0\mingw64\bin;%PATH%
+  - set PATH=C:\mingw-w64\i686-6.3.0-posix-dwarf-rt_v5-rev1\mingw64\bin;%PATH%
   - set PYTHON_VERSION=%CONFIGURATION%
   - ps: >-
       switch ($env:PYTHON_VERSION) {
-          "2.7" {$env:MINICONDA = """C:\Miniconda-x64"""}
-          "3.5" {$env:MINICONDA = """C:\Miniconda35-x64"""}
-          "3.6" {$env:MINICONDA = """C:\Miniconda36-x64"""}
-          "3.7" {$env:MINICONDA = """C:\Miniconda37-x64"""}
-          default {$env:MINICONDA = """C:\Miniconda37-x64"""}
+          "2.7" {$env:MINICONDA = """C:\Miniconda"""}
+          "3.5" {$env:MINICONDA = """C:\Miniconda35"""}
+          "3.6" {$env:MINICONDA = """C:\Miniconda36"""}
+          "3.7" {$env:MINICONDA = """C:\Miniconda37"""}
+          default {$env:MINICONDA = """C:\Miniconda37"""}
       }
   - set PATH=%MINICONDA%;%MINICONDA%\Scripts;%PATH%
   - ps: $env:LGB_VER = (Get-Content VERSION.txt).trim()
@@ -37,10 +37,12 @@ build_script:
           Exit -1
         }
       }
-      mkdir $env:APPVEYOR_BUILD_FOLDER/build; cd $env:APPVEYOR_BUILD_FOLDER/build
-      cmake -A x64 .. ; cmake --build . --target ALL_BUILD --config Release ; Check-Output $?
+      mkdir $env:APPVEYOR_BUILD_FOLDER/build
+      cd $env:APPVEYOR_BUILD_FOLDER/build
+      cmake -A x64 ..
+      cmake --build . --target ALL_BUILD --config Release
       cd $env:APPVEYOR_BUILD_FOLDER/python-package
-      python setup.py install --precompile ; Check-Output $?
+      python setup.py install --precompile
 
 test_script:
   - pytest %APPVEYOR_BUILD_FOLDER%\tests\python_package_test
